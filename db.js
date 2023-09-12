@@ -55,6 +55,45 @@ const addDepartment = async (name) => {
   const sql = `INSERT INTO department (name) VALUES (?)`;
   const [result] = await pool.query(sql, name);
 
+  // Add role 
+const addRole = async (title, salary, departmentId) => {
+
+    // Validate
+    if (!title || !salary || !departmentId) {
+      throw 'Title, salary, and department ID are required';
+    }
+  
+    // Insert role
+    const sql = `
+      INSERT INTO role (title, salary, department_id) 
+      VALUES (?, ?, ?)
+    `;
+  
+    const [result] = await pool.query(sql, [title, salary, departmentId]);
+  
+    return result;
+  
+  }
+  
+  // Add employee
+  const addEmployee = async (firstName, lastName, roleId, managerId) => {
+  
+    // Validation and inserting
+  
+    return result;
+  
+  } 
+  
+  // Update employee role
+  const updateEmployeeRole = async (employeeId, newRoleId) => {
+    
+    // Validate employeeId and newRoleId
+  
+    // Update statement
+  
+    return result;
+  
+  }
   return result;  
 
 }
