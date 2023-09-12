@@ -1,37 +1,67 @@
 // db.js
 
 const mysql = require('mysql2/promise');
+const fs = require('fs');
+const config = require('./config'); // database credentials
 
-// Database connection 
-const db = async () => {
+// Database connection pool
+const pool = mysql.createPool({
+  host: config.host,
+  database: config.database,
+  user: config.user,
+  password: config.password  
+});
 
-  // create the connection 
-  const connection = await mysql.createConnection({
-    host: 'localhost',
-    user: 'root', 
-    password: 'password',
-    database: 'employee_db'
-  });
+// Initialize database 
+const initializeDB = async () => {
 
-  // simple logger
-  console.log(`Connected to database: ${connection.config.database}`);
+  await pool.query(fs.readFileSync('./sql/schema.sql'));
 
-  return connection;
-}
+  await pool.query(fs.readFileSync('./sql/seeds.sql'));
 
-// Query functions  
-const getDepartments = async (connection) => {
-  const [rows] = await connection.query('SELECT * FROM department');
+};
+
+// Query functions
+
+const getDepartments = async () => {
+  const [rows] = await pool.query('SELECT * FROM department');
   return rows;
+} 
+
+const getRoles = async () => {
+  // Get roles logic...
 }
 
-const getEmployees = async (connection) => {
-  // employee query
+const getEmployees = async () => {
+  // Get employees logic... 
+}
+
+const addDepartment = async (name) => {
+
+  // Input validation
+  if (!name) {
+    throw 'Department name required';
+  }
+
+  if (typeof name !== 'string') {
+    throw 'Name must be a string';
+  }
+
+  if (name.length > 30) {
+    throw 'Name too long';
+  }
+
+  // Insert department
+  const sql = `INSERT INTO department (name) VALUES (?)`;
+  const [result] = await pool.query(sql, name);
+
+  return result;  
+
 }
 
 module.exports = {
-  db,
+  initializeDB,
   getDepartments,
-  getEmployees
+  getRoles,
   // etc
 }
