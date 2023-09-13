@@ -1,7 +1,7 @@
 // index.js
 
 const { menu, addDepartment } = require('./prompts');
-const { db, getDepartments } = require('./db');
+const { db, getDepartments } = require('./config/db');
 
 const main = async () => {
 
