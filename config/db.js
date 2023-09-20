@@ -6,7 +6,7 @@ require("dotenv").config()
 // const config = require('./config'); // database credentials
 
 // Database connection pool
-const pool = mysql.createPool({
+const db = mysql.createPool({
   host: process.env.HOST,
   database:process.env.DB_NAME,
   user: process.env.USER,
@@ -16,20 +16,22 @@ const pool = mysql.createPool({
 // Initialize database 
 const initializeDB = async () => {
 
-  await pool.query(fs.readFileSync('./sql/schema.sql'));
+  await db.query(fs.readFileSync('./sql/schema.sql'));
 
-  await pool.query(fs.readFileSync('./sql/seeds.sql'));
+  await db.query(fs.readFileSync('./sql/seeds.sql'));
 
 };
 
 // Query functions
 
 const getDepartments = async () => {
-  const [rows] = await pool.query('SELECT * FROM department');
+  const [rows] = await db.query('SELECT * FROM department');
   return rows;
 } 
 
-const getRoles = async () => {
+const getRoles = async () => { 
+  const [rows] = await db.query('SELECT * FROM role');
+return rows;
   // Get roles logic...
 }
 
@@ -54,8 +56,8 @@ const addDepartment = async (name) => {
 
   // Insert department
   const sql = `INSERT INTO department (name) VALUES (?)`;
-  const [result] = await pool.query(sql, name);
-
+  const [result] = await db.query(sql, name);
+}
   // Add role 
 const addRole = async (title, salary, departmentId) => {
 
@@ -70,7 +72,7 @@ const addRole = async (title, salary, departmentId) => {
       VALUES (?, ?, ?)
     `;
   
-    const [result] = await pool.query(sql, [title, salary, departmentId]);
+    const [result] = await db.query(sql, [title, salary, departmentId]);
   
     return result;
   
@@ -87,6 +89,8 @@ const addRole = async (title, salary, departmentId) => {
   
   // Update employee role
   const updateEmployeeRole = async (employeeId, newRoleId) => {
+
+  
     
     // Validate employeeId and newRoleId
   
@@ -95,13 +99,11 @@ const addRole = async (title, salary, departmentId) => {
     return result;
   
   }
-  return result;  
+  
 
-}
-
-module.exports = {
+module.exports = { db,
   initializeDB,
   getDepartments,
-  getRoles,
+  getRoles, addDepartment , addRole, getEmployees, addEmployee 
   // etc
 }
